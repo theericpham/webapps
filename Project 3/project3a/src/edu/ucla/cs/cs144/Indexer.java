@@ -19,7 +19,7 @@ public class Indexer {
     
     /** Creates a new instance of Indexer */
     public Indexer() {
-        indexDirectory = System.getenv("LUCENE_INDEX") + "/index";
+        indexDirectory = System.getenv("LUCENE_INDEX");
     }
 
     public IndexWriter getIndexWriter(String dir, boolean create) throws IOException {
