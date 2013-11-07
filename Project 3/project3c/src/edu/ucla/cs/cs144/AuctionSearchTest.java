@@ -41,6 +41,14 @@ public class AuctionSearchTest {
 			System.out.println(result.getItemId() + ": " + result.getName());
 		}
 
+		query = "cats";
+		basicResults = as.basicSearch(query, 0, 10);
+		System.out.println("Basic Seacrh Query: " + query);
+		System.out.println("Received " + basicResults.length + " results");
+		for(SearchResult result : basicResults) {
+			System.out.println(result.getItemId() + ": " + result.getName());
+		}
+
 		
 		// SearchConstraint constraint =
 		//     new SearchConstraint(FieldName.BuyPrice, "5.99"); 
