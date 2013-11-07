@@ -24,6 +24,10 @@ import java.text.SimpleDateFormat;
 import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchConstraint;
 import edu.ucla.cs.cs144.SearchResult;
+import edu.ucla.cs.cs144.Bid;
+
+import java.util.Set;
+import java.util.HashSet;
 
 public class AuctionSearch implements IAuctionSearch {
 
@@ -206,8 +210,66 @@ public class AuctionSearch implements IAuctionSearch {
 	}
 
 	public String getXMLDataForItemId(String itemId) {
-		// TODO: Your code here!
-		return null;
+		String XMLData = "";
+
+		try {
+			// Init DB Connection and Retrieve Item from Auctions
+			Connection conn = DbManager.getConnection(true);
+			PreparedStatement prepareItemSelect = conn.prepareStatement(
+				"SELECT * FROM Auctions WHERE ItemID = ?"
+			);
+			prepareItemSelect.setLong(1, Integer.parseInt(itemId));
+			ResultSet item = prepareItemSelect.executeQuery();
+
+			if (item.next()) {
+				// Auctions Fields
+				String name       	   = item.getString("Name");
+				String desc       	   = item.getString("Description");
+				String sellerID   	   = item.getString("SellerID");
+				Timestamp startTime    = item.getTimestamp("StartTime");
+				Timestamp endTime 	   = item.getTimestamp("EndTime");
+				Double buyPrice   	   = item.getDouble("BuyPrice");
+				Double startPrice  	   = item.getDouble("StartPrice");
+
+				// Seller Information
+				PreparedStatement prepareSellerSelect = conn.prepareStatement(
+					"SELECT * FROM Users WHERE UserID = ?"
+				);
+				prepareSellerSelect.setString(1, sellerID);
+				ResultSet seller = prepareSellerSelect.executeQuery();
+				int rating;
+				String location, country;
+				if (seller.next()) {
+					rating   = seller.getInt("Rating");
+					location = seller.getString("Location");
+					country  = seller.getString("Country");
+				}
+
+				// Categories
+				Set<String> categories = new HashSet<String>();
+				PreparedStatement prepareCategoriesSelect = conn.prepareStatement(
+					"SELECT Name FROM AuctionsCategories JOIN Categories ON AuctionsCategories.CategoryID = Categories.CategoryID WHERE ItemID = ?"
+				);
+				prepareCategoriesSelect.setLong(1, Integer.parseInt(itemId));
+				ResultSet categoryRS = prepareCategoriesSelect.executeQuery();
+				while (categoryRS.next()) {
+					categories.add(categoryRS.getString("Name"));
+				}
+
+				// Bids
+				List<Bid> bids = new ArrayList<Bid>();
+				PreparedStatement prepareBidsSelect = conn.prepareStatement(
+				);
+				ResultSet bidRS = prepareBidsSelect.executeQuery();
+
+
+			}
+
+		} catch (SQLException e) {
+			System.out.println("SQL Error.");
+		}
+
+		return XMLData;
 	}
 	
 	public String echo(String message) {
