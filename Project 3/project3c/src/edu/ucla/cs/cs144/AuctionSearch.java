@@ -26,6 +26,8 @@ import edu.ucla.cs.cs144.SearchConstraint;
 import edu.ucla.cs.cs144.SearchResult;
 import edu.ucla.cs.cs144.Bid;
 
+import java.math.BigDecimal;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +42,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
- 
+import java.io.StringWriter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -235,19 +238,19 @@ public class AuctionSearch implements IAuctionSearch {
 			PreparedStatement prepareItemSelect = conn.prepareStatement(
 				"SELECT * FROM Auctions WHERE ItemID = ?"
 			);
-			Integer id = Integer.parseInt(itemId);
+			long id = Long.parseLong(itemId);
 			prepareItemSelect.setLong(1, id);
 			ResultSet item = prepareItemSelect.executeQuery();
 
-			if (item.next()) {
+			while (item.next()) {
 				// Auctions Fields      
 				String name       	   = item.getString("Name");
 				String desc       	   = item.getString("Description");
 				String sellerID   	   = item.getString("SellerID");
 				Timestamp startTime    = item.getTimestamp("StartTime");
 				Timestamp endTime 	   = item.getTimestamp("EndTime");
-				Double buyPrice   	   = item.getDouble("BuyPrice");
-				Double startPrice  	   = item.getDouble("StartPrice");
+				BigDecimal buyPrice   	   = item.getBigDecimal("BuyPrice");
+				BigDecimal startPrice  	   = item.getBigDecimal("StartPrice");
 
 				// Seller Information
 				PreparedStatement prepareSellerSelect = conn.prepareStatement(
@@ -278,7 +281,7 @@ public class AuctionSearch implements IAuctionSearch {
 				// Bids
 				List<Bid> bids = new ArrayList<Bid>();
 				PreparedStatement prepareBidsSelect = conn.prepareStatement(
-					"SELET * FROM Bids JOIN Users on Bids.BidderID = Users.UserID WHERE ItemID = ? ORDER BY Time DESC"
+					"SELECT * FROM Bids JOIN Users on Bids.BidderID = Users.UserID WHERE ItemID = ? ORDER BY TIME ASC"
 				);
 				prepareBidsSelect.setLong(1, id);
 				ResultSet bidRS = prepareBidsSelect.executeQuery();
@@ -288,7 +291,7 @@ public class AuctionSearch implements IAuctionSearch {
 							id, 
 							bidRS.getString("BidderID"), 
 							bidRS.getTimestamp("Time"), 
-							bidRS.getDouble("Amount"), 
+							bidRS.getBigDecimal("Amount"), 
 							bidRS.getInt("Rating"),
 							bidRS.getString("Location"),
 							bidRS.getString("Country")
@@ -296,11 +299,9 @@ public class AuctionSearch implements IAuctionSearch {
 					);
 				}
 
-
-
-				/*
-				 *  Build XML Structure
-				 */
+			// 	/*
+			// 	 *  Build XML Structure
+			// 	 */
 				DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
 				DocumentBuilder b          = fac.newDocumentBuilder();
 				org.w3c.dom.Document doc   = b.newDocument();
@@ -323,21 +324,21 @@ public class AuctionSearch implements IAuctionSearch {
 				}
 
 				// currently element
-				double currentPrice = (bids.size()) > 0 ? bids.get(bids.size()-1).getAmount() : startPrice;
+				BigDecimal currentPrice = (bids.size()) > 0 ? bids.get(bids.size()-1).getAmount() : startPrice;
 				Element currElem = doc.createElement("Currently");
-				currElem.appendChild(doc.createTextNode(Double.toString(currentPrice)));
+				currElem.appendChild(doc.createTextNode("$" + currentPrice.toString()));
 				root.appendChild(currElem);
 
 				// buy 
-				if (!buyPrice.equals("")) {
+				if (buyPrice.doubleValue() > 0) {
 					Element buyElem = doc.createElement("Buy_Price");
-					buyElem.appendChild(doc.createTextNode(Double.toString(buyPrice)));
+					buyElem.appendChild(doc.createTextNode("$" + buyPrice.toString()));
 					root.appendChild(buyElem);
 				}
 
 				// start
 				Element startElem = doc.createElement("First_Bid");
-				startElem.appendChild(doc.createTextNode(Double.toString(startPrice)));
+				startElem.appendChild(doc.createTextNode("$" + startPrice.toString()));
 				root.appendChild(startElem);
 
 				// num bids
@@ -375,7 +376,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 					// amount
 					Element amountElem = doc.createElement("Amount"); 
-					amountElem.appendChild(doc.createTextNode(Double.toString(bid.getAmount())));
+					amountElem.appendChild(doc.createTextNode("$" + bid.getAmount().toString()));
 					bidElem.appendChild(amountElem);
 
 					bidsElem.appendChild(bidElem);
@@ -404,23 +405,35 @@ public class AuctionSearch implements IAuctionSearch {
 
 				// seller
 				Element sellerElem = doc.createElement("Seller");
-				sellerElem.setAttribute("UserID", sellerID);
 				sellerElem.setAttribute("Rating", Integer.toString(rating));
+				sellerElem.setAttribute("UserID", sellerID);
 				root.appendChild(sellerElem);
 
 				// description
 				Element descElem = doc.createElement("Description");
-				descElem.appendChild(doc.createTextNode(description));
+				descElem.appendChild(doc.createTextNode(desc));
 				root.appendChild(descElem);
 
 				doc.appendChild(root);
 
+				TransformerFactory tfac = TransformerFactory.newInstance();
+				Transformer transformer = tfac.newTransformer();
+				DOMSource source = new DOMSource(doc);
+				StringWriter w = new StringWriter();
+				StreamResult r = new StreamResult(w);
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+				transformer.transform(source, r);
+				XMLData = w.toString();
 			}
 
 		} catch (SQLException e) {
 			System.out.println("SQL Error.");
+			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
 			System.out.println("Parser Configuration Error.");
+		} catch (TransformerException e) {
+			System.out.println("Transformer Error.");
 		}
 
 		return XMLData;

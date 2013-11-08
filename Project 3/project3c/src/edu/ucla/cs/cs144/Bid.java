@@ -1,9 +1,10 @@
 package edu.ucla.cs.cs144;
 
 import java.sql.Timestamp;
+import java.math.BigDecimal;
 
 public class Bid {
-	public Bid(int iid, String bid, Timestamp t, double a, int r, String l, String c) {
+	public Bid(long iid, String bid, Timestamp t, BigDecimal a, int r, String l, String c) {
 		itemID   = iid;
 		bidderID = bid;
 		time     = t;
@@ -11,21 +12,20 @@ public class Bid {
 		rating   = r;
 		location = l;
 		country  = c;
-
 	}
 
-	public int getItemID() { return itemID; }
+	public long getItemID() { return itemID; }
 	public String getBidderID() { return bidderID; }
 	public Timestamp getTime() { return time; }
-	public double getAmount() { return amount; }
+	public BigDecimal getAmount() { return amount; }
 	public int getBidderRating() { return rating; }
 	public String getBidderLocation() { return location; }
 	public String getBidderCountry() { return country; }
 
-	private int itemID;
+	private long itemID;
 	private String bidderID;
 	private Timestamp time;
-	private double amount;
+	private BigDecimal amount;
 	private int rating;
 	private String location;
 	private String country;
