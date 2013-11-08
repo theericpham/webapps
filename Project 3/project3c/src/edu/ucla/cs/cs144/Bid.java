@@ -15,12 +15,12 @@ public class Bid {
 	}
 
 	public int getItemID() { return itemID; }
-	public String getbidderID() { return bidderID; }
+	public String getBidderID() { return bidderID; }
 	public Timestamp getTime() { return time; }
 	public double getAmount() { return amount; }
-	private int getBidderRating() { return rating; }
-	private String getBidderLocation() { return location; }
-	private String getBidderCountry() { return country; }
+	public int getBidderRating() { return rating; }
+	public String getBidderLocation() { return location; }
+	public String getBidderCountry() { return country; }
 
 	private int itemID;
 	private String bidderID;

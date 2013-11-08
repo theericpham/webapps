@@ -31,6 +31,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
+/*
+ *  Libraries to help with XML creation
+ */
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+ 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+
 public class AuctionSearch implements IAuctionSearch {
 
 	/* 
@@ -240,8 +255,9 @@ public class AuctionSearch implements IAuctionSearch {
 				);
 				prepareSellerSelect.setString(1, sellerID);
 				ResultSet seller = prepareSellerSelect.executeQuery();
-				int rating;
-				String location, country;
+				int rating = 0;
+				String location = "";
+				String country  = "";
 				if (seller.next()) {
 					rating   = seller.getInt("Rating");
 					location = seller.getString("Location");
@@ -262,7 +278,7 @@ public class AuctionSearch implements IAuctionSearch {
 				// Bids
 				List<Bid> bids = new ArrayList<Bid>();
 				PreparedStatement prepareBidsSelect = conn.prepareStatement(
-					"SELET * FROM Bids JOIN Users on Bids.BidderID = Users.UserID WHERE ItemID = ?"
+					"SELET * FROM Bids JOIN Users on Bids.BidderID = Users.UserID WHERE ItemID = ? ORDER BY Time DESC"
 				);
 				prepareBidsSelect.setLong(1, id);
 				ResultSet bidRS = prepareBidsSelect.executeQuery();
@@ -280,14 +296,131 @@ public class AuctionSearch implements IAuctionSearch {
 					);
 				}
 
+
+
 				/*
 				 *  Build XML Structure
 				 */
+				DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+				DocumentBuilder b          = fac.newDocumentBuilder();
+				org.w3c.dom.Document doc   = b.newDocument();
+
+				// root element
+				Element root = doc.createElement("Item");
+				root.setAttribute("ItemID", itemId);
+
+				// name element
+				Element nameElem = doc.createElement("Name");
+				nameElem.appendChild(doc.createTextNode(name));
+				root.appendChild(nameElem);
+
+				// category elements
+				Element catElem;
+				for (String c : categories) {
+					catElem = doc.createElement("Category");
+					catElem.appendChild(doc.createTextNode(c));
+					root.appendChild(catElem);
+				}
+
+				// currently element
+				double currentPrice = (bids.size()) > 0 ? bids.get(bids.size()-1).getAmount() : startPrice;
+				Element currElem = doc.createElement("Currently");
+				currElem.appendChild(doc.createTextNode(Double.toString(currentPrice)));
+				root.appendChild(currElem);
+
+				// buy 
+				if (!buyPrice.equals("")) {
+					Element buyElem = doc.createElement("Buy_Price");
+					buyElem.appendChild(doc.createTextNode(Double.toString(buyPrice)));
+					root.appendChild(buyElem);
+				}
+
+				// start
+				Element startElem = doc.createElement("First_Bid");
+				startElem.appendChild(doc.createTextNode(Double.toString(startPrice)));
+				root.appendChild(startElem);
+
+				// num bids
+				Element numBidsElem = doc.createElement("Number_of_Bids");
+				numBidsElem.appendChild(doc.createTextNode(Integer.toString(bids.size())));
+				root.appendChild(numBidsElem);
+
+				// bids
+				Element bidsElem = doc.createElement("Bids");
+				Element bidElem;
+				for (Bid bid : bids) {
+					bidElem = doc.createElement("Bid");
+
+					// bidder
+					Element bidderElem = doc.createElement("Bidder");
+					bidderElem.setAttribute("UserID", bid.getBidderID());
+					bidderElem.setAttribute("Rating", Integer.toString(bid.getBidderRating()));
+					if (!bid.getBidderLocation().equals("")) {
+						Element locElem = doc.createElement("Location");
+						locElem.appendChild(doc.createTextNode(bid.getBidderLocation()));
+						bidderElem.appendChild(locElem);
+					}
+					if (!bid.getBidderCountry().equals("")) {
+						Element countryElem = doc.createElement("Country");
+						countryElem.appendChild(doc.createTextNode(bid.getBidderCountry()));
+						bidderElem.appendChild(countryElem);
+					}
+					bidElem.appendChild(bidderElem);
+
+					// time
+					Element timeElem = doc.createElement("Time");
+					String t = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").format(bid.getTime());
+					timeElem.appendChild(doc.createTextNode(t));
+					bidElem.appendChild(timeElem);
+
+					// amount
+					Element amountElem = doc.createElement("Amount"); 
+					amountElem.appendChild(doc.createTextNode(Double.toString(bid.getAmount())));
+					bidElem.appendChild(amountElem);
+
+					bidsElem.appendChild(bidElem);
+				}
+				root.appendChild(bidsElem);
+
+				// location
+				Element locElem = doc.createElement("Location");
+				locElem.appendChild(doc.createTextNode(location));
+				root.appendChild(locElem);
+
+				// country
+				Element countryElem = doc.createElement("Country");
+				countryElem.appendChild(doc.createTextNode(country));
+				root.appendChild(countryElem);
+
+				// started
+				Element startedElem = doc.createElement("Started");
+				startedElem.appendChild(doc.createTextNode(new SimpleDateFormat("MMM-dd-yy HH:mm:ss").format(startTime)));
+				root.appendChild(startedElem);
+
+				// ends
+				Element endsElem = doc.createElement("Ends");
+				endsElem.appendChild(doc.createTextNode(new SimpleDateFormat("MMM-dd-yy HH:mm:ss").format(endTime)));
+				root.appendChild(endsElem);
+
+				// seller
+				Element sellerElem = doc.createElement("Seller");
+				sellerElem.setAttribute("UserID", sellerID);
+				sellerElem.setAttribute("Rating", Integer.toString(rating));
+				root.appendChild(sellerElem);
+
+				// description
+				Element descElem = doc.createElement("Description");
+				descElem.appendChild(doc.createTextNode(description));
+				root.appendChild(descElem);
+
+				doc.appendChild(root);
 
 			}
 
 		} catch (SQLException e) {
 			System.out.println("SQL Error.");
+		} catch (ParserConfigurationException e) {
+			System.out.println("Parser Configuration Error.");
 		}
 
 		return XMLData;
