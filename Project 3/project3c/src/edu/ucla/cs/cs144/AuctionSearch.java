@@ -83,6 +83,8 @@ public class AuctionSearch implements IAuctionSearch {
 			Query q = parser.parse(QueryParser.escape(query));
 			Hits hits = searcher.search(q);
 
+			numResultsToReturn = (numResultsToReturn == 0) ? hits.length() - numResultsToSkip : numResultsToReturn;
+			if (numResultsToReturn < 0) return new SearchResult[0];
 			SearchResult[] results = new SearchResult[numResultsToReturn];
 			Iterator<Hit> iter = hits.iterator();
 			int ix = 0;

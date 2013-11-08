@@ -13,9 +13,9 @@ public class AuctionSearchTest {
 	{
 		AuctionSearch as = new AuctionSearch();
 
-		// String message = "Test message";
-		// String reply = as.echo(message);
-		// System.out.println("Reply: " + reply);
+		String message = "Test message";
+		String reply = as.echo(message);
+		System.out.println("Reply: " + reply);
 		
 		// String query = "superman";
 		// SearchResult[] basicResults = as.basicSearch(query, 0, 20);
@@ -24,31 +24,6 @@ public class AuctionSearchTest {
 		// for(SearchResult result : basicResults) {
 		// 	System.out.println(result.getItemId() + ": " + result.getName());
 		// }
-
-		// query = "kitchenware";
-		// basicResults = as.basicSearch(query, 0, 20);
-		// System.out.println("Basic Seacrh Query: " + query);
-		// System.out.println("Received " + basicResults.length + " results");
-		// for(SearchResult result : basicResults) {
-		// 	System.out.println(result.getItemId() + ": " + result.getName());
-		// }
-
-		// query = "star trek";
-		// basicResults = as.basicSearch(query, 0, 20);
-		// System.out.println("Basic Seacrh Query: " + query);
-		// System.out.println("Received " + basicResults.length + " results");
-		// for(SearchResult result : basicResults) {
-		// 	System.out.println(result.getItemId() + ": " + result.getName());
-		// }
-
-		// query = "cats";
-		// basicResults = as.basicSearch(query, 0, 10);
-		// System.out.println("Basic Seacrh Query: " + query);
-		// System.out.println("Received " + basicResults.length + " results");
-		// for(SearchResult result : basicResults) {
-		// 	System.out.println(result.getItemId() + ": " + result.getName());
-		// }
-
 		
 		// SearchConstraint constraint =
 		//     new SearchConstraint(FieldName.BuyPrice, "5.99"); 
@@ -60,22 +35,42 @@ public class AuctionSearchTest {
 		// 	System.out.println(result.getItemId() + ": " + result.getName());
 		// }
 		
-		String itemId = "1497595357";
-		String item = as.getXMLDataForItemId(itemId);
-		System.out.println("XML data for ItemId: " + itemId);
-		System.out.println(item);
+		// String itemId = "1497595357";
+		// String item = as.getXMLDataForItemId(itemId);
+		// System.out.println("XML data for ItemId: " + itemId);
+		// System.out.println(item);
 
 		// Add your own test here
-		String[] itemIds = { "1497595357", 
-						   "1497497054",
-						   "1045764509",
-						   "1045767117"
-		                 };
 
-		for (String id : itemIds) {
-			item = as.getXMLDataForItemId(id);
-			System.out.println("XML data for ItemId: " + id);
-			System.out.println(item);
+		String[] basicQueries = {
+			"superman",
+			"kitchenware",
+			"star trek",
+			"'s",
+			"*"
+		};
+
+		String[] itemIds = { 
+			"1497595357", 
+			"1497497054",
+			"1045764509",
+		};
+
+		SearchResult[] basicResults;
+		for (String q : basicQueries) {
+			basicResults = as.basicSearch(q, 20, 0);
+			System.out.println("Basic Search Query: " + q);
+			System.out.println("Received " + basicResults.length + " results");
+			// for(SearchResult result : basicResults) {
+			// 	System.out.println(result.getItemId() + ": " + result.getName());
+			// }
 		}
+
+		// String item;
+		// for (String id : itemIds) {
+		// 	item = as.getXMLDataForItemId(id);
+		// 	System.out.println("XML data for ItemId: " + id);
+		// 	System.out.println(item);
+		// }
 	}
 }
