@@ -80,7 +80,7 @@ public class AuctionSearch implements IAuctionSearch {
 			searcher = new IndexSearcher(indexDirectory);
 			parser = new QueryParser("content", new StandardAnalyzer());
 
-			Query q = parser.parse(query);
+			Query q = parser.parse(QueryParser.escape(query));
 			Hits hits = searcher.search(q);
 
 			SearchResult[] results = new SearchResult[numResultsToReturn];
