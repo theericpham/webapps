@@ -66,12 +66,16 @@ public class AuctionSearchTest {
 		System.out.println(item);
 
 		// Add your own test here
-		item = as.getXMLDataForItemId("1045767117");
-		System.out.println("XML data for ItemId: 1045767117");
-		System.out.println(item);
+		String[] itemIds = { "1497595357", 
+						   "1497497054",
+						   "1045764509",
+						   "1045767117"
+		                 };
 
-		item = as.getXMLDataForItemId("1497497054");
-		System.out.println("XML data for ItemId: 1497497054");
-		System.out.println(item);
+		for (String id : itemIds) {
+			item = as.getXMLDataForItemId(id);
+			System.out.println("XML data for ItemId: " + id);
+			System.out.println(item);
+		}
 	}
 }

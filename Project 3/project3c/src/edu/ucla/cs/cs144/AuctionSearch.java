@@ -309,6 +309,7 @@ public class AuctionSearch implements IAuctionSearch {
 				// root element
 				Element root = doc.createElement("Item");
 				root.setAttribute("ItemID", itemId);
+				doc.appendChild(root);
 
 				// name element
 				Element nameElem = doc.createElement("Name");
@@ -413,8 +414,6 @@ public class AuctionSearch implements IAuctionSearch {
 				Element descElem = doc.createElement("Description");
 				descElem.appendChild(doc.createTextNode(desc));
 				root.appendChild(descElem);
-
-				doc.appendChild(root);
 
 				TransformerFactory tfac = TransformerFactory.newInstance();
 				Transformer transformer = tfac.newTransformer();
