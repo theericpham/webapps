@@ -28,6 +28,8 @@ import edu.ucla.cs.cs144.Bid;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
 public class AuctionSearch implements IAuctionSearch {
 
@@ -218,11 +220,12 @@ public class AuctionSearch implements IAuctionSearch {
 			PreparedStatement prepareItemSelect = conn.prepareStatement(
 				"SELECT * FROM Auctions WHERE ItemID = ?"
 			);
-			prepareItemSelect.setLong(1, Integer.parseInt(itemId));
+			Integer id = Integer.parseInt(itemId);
+			prepareItemSelect.setLong(1, id);
 			ResultSet item = prepareItemSelect.executeQuery();
 
 			if (item.next()) {
-				// Auctions Fields
+				// Auctions Fields      
 				String name       	   = item.getString("Name");
 				String desc       	   = item.getString("Description");
 				String sellerID   	   = item.getString("SellerID");
@@ -250,7 +253,7 @@ public class AuctionSearch implements IAuctionSearch {
 				PreparedStatement prepareCategoriesSelect = conn.prepareStatement(
 					"SELECT Name FROM AuctionsCategories JOIN Categories ON AuctionsCategories.CategoryID = Categories.CategoryID WHERE ItemID = ?"
 				);
-				prepareCategoriesSelect.setLong(1, Integer.parseInt(itemId));
+				prepareCategoriesSelect.setLong(1, id);
 				ResultSet categoryRS = prepareCategoriesSelect.executeQuery();
 				while (categoryRS.next()) {
 					categories.add(categoryRS.getString("Name"));
@@ -259,9 +262,27 @@ public class AuctionSearch implements IAuctionSearch {
 				// Bids
 				List<Bid> bids = new ArrayList<Bid>();
 				PreparedStatement prepareBidsSelect = conn.prepareStatement(
+					"SELET * FROM Bids JOIN Users on Bids.BidderID = Users.UserID WHERE ItemID = ?"
 				);
+				prepareBidsSelect.setLong(1, id);
 				ResultSet bidRS = prepareBidsSelect.executeQuery();
+				while (bidRS.next()) {
+					bids.add(
+						new Bid(
+							id, 
+							bidRS.getString("BidderID"), 
+							bidRS.getTimestamp("Time"), 
+							bidRS.getDouble("Amount"), 
+							bidRS.getInt("Rating"),
+							bidRS.getString("Location"),
+							bidRS.getString("Country")
+						)
+					);
+				}
 
+				/*
+				 *  Build XML Structure
+				 */
 
 			}
 
