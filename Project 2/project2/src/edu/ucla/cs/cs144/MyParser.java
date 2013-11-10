@@ -449,7 +449,7 @@ class MyParser {
             categories = new HashMap<String, String>();
             ic 		   = new HashMap<String, Set<String>>();
 
-            nCat = 0;
+            nCat = 1;
 
         	/* Process all files listed on command line. */
 	        for (int i = 0; i < args.length; i++) {
