@@ -45,6 +45,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
 
         	Element root = doc.getDocumentElement();
 
+        	// Item data
         	String itemId = root.getAttribute("ItemID");
         	String name = getElementTextByTagName(root, "Name");
 			String description = getElementTextByTagName(root, "Description");
@@ -53,18 +54,25 @@ public class ItemServlet extends HttpServlet implements Servlet {
 			Date startTime = new Date(getElementTextByTagName(root, "Started"));
 			Date endTime = new Date(getElementTextByTagName(root, "Ends"));
 
-        	// // Parse Seller Information
-        	// Element sellerElement = root.getElementsByTagName("Seller").item(0);
-        	// String sellerId = sellerElement.getAttribute("UserID");
-        	// int sellerRating = sellerElement.getAttribute("Rating");
-        	// String location = root.getElementsByTagName("Location").item(0).getTextContent();
-        	// String country = root.getElementsByTagName("Country").item(0).getTextContent();
+			// Seller data
+			// Node seller = root.getElementsByTagName("Seller").item(0);
+			// String sellerId = seller.getAttribute("UserID");
+			// String sellerRating = seller.getAttribute("Rating");
+			String location = getElementTextByTagName(root, "Location");
+			String country = getElementTextByTagName(root, "Country");
 
 
-	        Item item = new Item(itemId, name, description, startPrice, buyPrice, startTime, endTime);
-	        request.setAttribute("item", item);
-	        request.setAttribute("name", name);
-	        request.setAttribute("buy", strip(getElementTextByTagName(root, "Buy_Price")));
+			request.setAttribute("itemId", itemId);
+			request.setAttribute("name", name);
+			request.setAttribute("description", description);
+			request.setAttribute("startPrice", startPrice);
+			request.setAttribute("buyPrice", buyPrice);
+			request.setAttribute("startTime", startTime);
+			request.setAttribute("endTime", endTime);
+			// request.setAttribute("sellerId", sellerId);
+			// request.setAttribute("sellerRating", sellerRating);
+			request.setAttribute("location", location);
+			request.setAttribute("country", country);
 	        request.getRequestDispatcher("/item.jsp").forward(request, response);
         } catch (SAXException e) {
         	System.out.println("SAX Exception Occurred.");
