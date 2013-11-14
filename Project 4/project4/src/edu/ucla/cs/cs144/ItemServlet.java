@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 
 public class ItemServlet extends HttpServlet implements Servlet {
@@ -19,8 +23,30 @@ public class ItemServlet extends HttpServlet implements Servlet {
         String id = request.getParameter("id");
         String xmlData = AuctionSearchClient.getXMLDataForItemId(id);
 
-        request.setAttribute("xmlData", xmlData);
-        request.getRequestDispatcher("/item.jsp").forward(request, response);
+        // Create and parse XML DOM from xml data
+        try {
+        	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        	DocumentBuilder builder = factory.newDocumentBuilder();
+        	Document doc = builder.parse(new InputSource(new StringReader(xmlData)));
+
+        	Element root = doc.getDocumentElement();
+        	String itemId = root.getAttribute("ItemID");
+        	String tag = root.getTagName();
+
+        	request.setAttribute("xmlData", xmlData);
+	        request.setAttribute("id", itemId);
+	        request.setAttribute("rootTag", tag);
+	        request.getRequestDispatcher("/item.jsp").forward(request, response);
+        } catch (SAXException e) {
+        	System.out.println("SAX Exception Occurred.");
+        	e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+			System.out.println("Parser Configuration Exception Occurred.");
+        	e.printStackTrace();
+        } catch (IOException e) {
+			System.out.println("I/O Exception Occurred.");
+        	e.printStackTrace();
+        }
 
         // // test
         // response.setContentType("text/html");

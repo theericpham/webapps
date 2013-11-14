@@ -8,6 +8,10 @@
 
 <%= request.getAttribute("xmlData") %>
 
+<h2> ItemId: <%= request.getAttribute("id") %> </h2>
+<h2> Root Tag: <%= request.getAttribute("rootTag") %> </h2>
+
+
 </body>
 
 </html>
