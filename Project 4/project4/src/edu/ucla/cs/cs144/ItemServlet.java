@@ -30,6 +30,15 @@ public class ItemServlet extends HttpServlet implements Servlet {
     	return (money.equals("")) ? new BigDecimal("0.00") : new BigDecimal(money.substring(1));
     }
 
+    private String[] toStringArray(NodeList list) {
+    	int size = list.getLength();
+    	String[] res = new String[size];
+    	for (int i = 0; i < size; i++) {
+    		res[i] = list.item(i).getTextContent();
+    	}
+    	return res;
+    }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
@@ -61,6 +70,9 @@ public class ItemServlet extends HttpServlet implements Servlet {
 			String location = getElementTextByTagName(root, "Location");
 			String country = getElementTextByTagName(root, "Country");
 
+			// Categories
+
+			String[] categories = toStringArray(root.getElementsByTagName("Category"));
 
 			request.setAttribute("itemId", itemId);
 			request.setAttribute("name", name);
@@ -69,6 +81,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
 			request.setAttribute("buyPrice", buyPrice);
 			request.setAttribute("startTime", startTime);
 			request.setAttribute("endTime", endTime);
+			// request.setAttribute("categories", categories);
 			// request.setAttribute("sellerId", sellerId);
 			// request.setAttribute("sellerRating", sellerRating);
 			request.setAttribute("location", location);
