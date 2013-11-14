@@ -2,11 +2,11 @@ package edu.ucla.cs.cs144;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
+import java.text.SimpleDateFormat;
 
 public class Item {
 
-	public Item(long id, String nm, String desc, BigDecimal sp, BigDecimal bp, Date st, Date et, User s, Set<String> c) {
+	public Item(String id, String nm, String desc, BigDecimal sp, BigDecimal bp, Date st, Date et) {
 		itemId = id;
 		name = nm;
 		description = desc;
@@ -14,27 +14,23 @@ public class Item {
 		buyPrice = bp;
 		startTime = st;
 		endTime = et;
-		seller = s;
-		categories = c;
+		sdf = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
 	}
 
-	public long getId() { return itemId; }
+	public String getId() { return itemId; }
 	public String getName() { return name; }
 	public String getDescription() { return description; }
-	public BigDecimal getStartPrice() { return startPrice; }
-	public BigDecimal getBuyPrice() { return buyPrice; }
-	public Date getStartTime() { return startTime; }
-	public Date getEndTime() { return endTime; }
-	public User getSeller() { return seller; }
-	public Set<String> getCategories() { return categories; }
+	public String getStartPrice() { return "$" + startPrice; }
+	public String getBuyPrice() { return "$" + buyPrice; }
+	public String getStartTime() { return sdf.format(startTime); }
+	public String getEndTime() { return sdf.format(endTime); }
 
-	private long itemId;
+	private String itemId;
 	private String name;
 	private String description;
 	private BigDecimal startPrice;
 	private BigDecimal buyPrice;
 	private Date startTime;
 	private Date endTime;
-	private User seller;
-	private Set<String> categories;
+	private SimpleDateFormat sdf;
 }

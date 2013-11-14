@@ -1,16 +1,16 @@
+<%@ page import="package edu.ucla.cs.cs144.*;" %>
+
 <html>
 
 <head> <title> Item Servlet Response </title> </head>
 
 <body>
 
-<h1> This is our JSP </h1>
+<%= Item item = (Item) request.getAttribute("item") %>
 
-<%= request.getAttribute("xmlData") %>
-
-<h2> ItemId: <%= request.getAttribute("id") %> </h2>
-<h2> Root Tag: <%= request.getAttribute("rootTag") %> </h2>
-
+<h1> Name: <%= request.getAttribute("name") %> </h1>
+<h1> Buy For: <%= request.getAttribute("buy") %> </h1>
+<h1> Minimum Bid: <%= item.getStartPrice() %> </h1>
 
 </body>
 
