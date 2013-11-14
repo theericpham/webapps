@@ -19,16 +19,19 @@ public class ItemServlet extends HttpServlet implements Servlet {
         String id = request.getParameter("id");
         String xmlData = AuctionSearchClient.getXMLDataForItemId(id);
 
+        request.setAttribute("xmlData", xmlData);
+        request.getRequestDispatcher("/item.jsp").forward(request, response);
+
         // // test
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+        // response.setContentType("text/html");
+        // PrintWriter out = response.getWriter();
 
-        out.println("<html> <head> <title> Item Servlet Response </title> </head>");
-        out.println("<body>");
-        out.println(xmlData);
-        out.println("</body>");
-        out.println("</html>");
+        // out.println("<html> <head> <title> Item Servlet Response </title> </head>");
+        // out.println("<body>");
+        // out.println(xmlData);
+        // out.println("</body>");
+        // out.println("</html>");
 
-        out.close();
+        // out.close();
     }
 }
