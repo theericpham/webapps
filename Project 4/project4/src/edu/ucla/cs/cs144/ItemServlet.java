@@ -7,12 +7,28 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.*;
+
 public class ItemServlet extends HttpServlet implements Servlet {
        
     public ItemServlet() {}
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        // your codes here
+        // Extract ItemID from request and get xml data
+        String id = request.getParameter("id");
+        String xmlData = AuctionSearchClient.getXMLDataForItemId(id);
+
+        // // test
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<html> <head> <title> Item Servlet Response </title> </head>");
+        out.println("<body>");
+        out.println(xmlData);
+        out.println("</body>");
+        out.println("</html>");
+
+        out.close();
     }
 }
