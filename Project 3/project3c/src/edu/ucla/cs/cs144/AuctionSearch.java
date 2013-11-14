@@ -25,6 +25,7 @@ import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchConstraint;
 import edu.ucla.cs.cs144.SearchResult;
 import edu.ucla.cs.cs144.Bid;
+import edu.ucla.cs.cs144.FieldName;
 
 import java.math.BigDecimal;
 
@@ -69,6 +70,21 @@ public class AuctionSearch implements IAuctionSearch {
          * placed at src/edu/ucla/cs/cs144.
          *
          */
+	
+	private ArrayList<SearchResult> intersection(ArrayList<SearchResult> l1, ArrayList<SearchResult> l2) {
+		ArrayList<SearchResult> result = new ArrayList<SearchResult>();
+		for (SearchResult sr1 : l1) {
+			String item_id = sr1.getItemId();
+			for (SearchResult sr2 : l2) {
+				if (item_id.equals(sr2.getItemId())) {
+					result.add(sr1);
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
 	public AuctionSearch() {
 		indexDirectory = System.getenv("LUCENE_INDEX");
 	}
@@ -83,8 +99,11 @@ public class AuctionSearch implements IAuctionSearch {
 			Query q = parser.parse(QueryParser.escape(query));
 			Hits hits = searcher.search(q);
 
-			numResultsToReturn = (numResultsToReturn == 0) ? hits.length() - numResultsToSkip : numResultsToReturn;
-			if (numResultsToReturn < 0) return new SearchResult[0];
+			int num_possible = hits.length() - numResultsToSkip;
+			if (num_possible < 1) return new SearchResult[0];
+			if (numResultsToReturn == 0) numResultsToReturn = num_possible;
+			if (numResultsToReturn > num_possible) numResultsToReturn = num_possible;
+
 			SearchResult[] results = new SearchResult[numResultsToReturn];
 			Iterator<Hit> iter = hits.iterator();
 			int ix = 0;
@@ -112,11 +131,15 @@ public class AuctionSearch implements IAuctionSearch {
 	public SearchResult[] advancedSearch(SearchConstraint[] constraints, 
 			int numResultsToSkip, int numResultsToReturn) {
 
-		//query strings		
+		//query strings and flags		
 		String sql_query = "SELECT DISTINCT Auctions.ItemId, Name FROM Auctions LEFT JOIN Bids ON Auctions.ItemId=Bids.ItemId WHERE 1";
+		boolean uses_sql = false;
 		String lucene_ItemName_query ="";
+		boolean uses_lucene_name = false;
 		String lucene_Category_query ="";
+		boolean uses_lucene_category = false;
 		String lucene_Description_query ="";
+		boolean uses_lucene_description = false;
 
 		//variables to store search contraints
 		String fieldName;
@@ -126,104 +149,190 @@ public class AuctionSearch implements IAuctionSearch {
 		for (int i=0; i<constraints.length; i++) {
 			fieldName = constraints[i].getFieldName();
 			value = constraints[i].getValue();
-			if (fieldName=="ItemName") {
+			if (fieldName.equals(FieldName.ItemName)) {
 				lucene_ItemName_query+=" "+value;
+				uses_lucene_name = true;
 			}
-			else if (fieldName=="Category") {
+			else if (fieldName.equals(FieldName.Category)) {
 				lucene_Category_query+=" "+value;
+				uses_lucene_category = true;
 			}
-			else if (fieldName=="SellerId") {
-				sql_query+=" AND SellerId="+value;
+			else if (fieldName.equals(FieldName.SellerId)) {
+				sql_query+=" AND SellerID=\""+value+"\"";
+				uses_sql = true;
 			}
-			else if (fieldName=="BuyPrice") {
+			else if (fieldName.equals(FieldName.BuyPrice)) {
 				sql_query+=" AND BuyPrice="+value;
+				uses_sql = true;
 			}
-			else if (fieldName=="Bidder") {
-				sql_query+=" AND BidderId="+value;
+			else if (fieldName.equals(FieldName.BidderId)) {
+				sql_query+=" AND BidderID=\""+value+"\"";
+				uses_sql = true;
 			}
-			else if (fieldName=="EndTime") {
-				sql_query+=" AND EndTime="+value;
+			else if (fieldName.equals(FieldName.EndTime)) {
+				try {
+				 	Date d = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(value);
+				 	String timestamp_string= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
+					sql_query+=" AND EndTime=\""+timestamp_string+"\"";
+					uses_sql = true;
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			else if (fieldName=="Description") {
+			else if (fieldName.equals(FieldName.Description)) {
 				lucene_Description_query+=" "+value;
+				uses_lucene_description = true;
 			}
 		}
 
 		//ArrayLists to hold the results
 		ArrayList<SearchResult> mysql_results = new ArrayList<SearchResult>();
-		ArrayList<SearchResult> lucene_results = new ArrayList<SearchResult>();
+		ArrayList<SearchResult> lucene_name_results = new ArrayList<SearchResult>();
+		ArrayList<SearchResult> lucene_category_results = new ArrayList<SearchResult>();
+		ArrayList<SearchResult> lucene_description_results = new ArrayList<SearchResult>();
 		ArrayList<SearchResult> combined_results = new ArrayList<SearchResult>();
 
 		//run SQL query
-		try {
-			Class.forName("com.mysql.jdbc.Driver"); 
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CS144", "cs144", ""); 
-			Statement s = con.createStatement();
-			ResultSet rs = s.executeQuery(sql_query);
-			String itemId, name;
-			while(rs.next()) {
-				SearchResult sr = new SearchResult(rs.getString("ItemId"),rs.getString("Name"));
-				mysql_results.add(sr);
+		if (uses_sql) {
+			try {
+				Class.forName("com.mysql.jdbc.Driver"); 
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CS144", "cs144", ""); 
+				Statement s = con.createStatement();
+				ResultSet rs = s.executeQuery(sql_query);
+				String itemId, name;
+				while(rs.next()) {
+					mysql_results.add(new SearchResult(rs.getString("ItemId"),rs.getString("Name")));
+				}
+				rs.close();
+				s.close();
+				con.close();
 			}
+			catch (ClassNotFoundException ex) {
+			            System.out.println(ex);
+		       	} 
+		       	catch (SQLException ex) {
+			            System.out.println("SQLException caught");
+			            System.out.println("---");
+			            while ( ex != null ){
+			                System.out.println("Message   : " + ex.getMessage());
+			                System.out.println("SQLState  : " + ex.getSQLState());
+			                System.out.println("ErrorCode : " + ex.getErrorCode());
+			                System.out.println("---");
+			                ex = ex.getNextException();
+		            		}
+		       	}	
 		}
-		catch (ClassNotFoundException ex) {
-		            System.out.println(ex);
-	       	} 
-	       	catch (SQLException ex) {
-		            System.out.println("SQLException caught");
-		            System.out.println("---");
-		            while ( ex != null ){
-		                System.out.println("Message   : " + ex.getMessage());
-		                System.out.println("SQLState  : " + ex.getSQLState());
-		                System.out.println("ErrorCode : " + ex.getErrorCode());
-		                System.out.println("---");
-		                ex = ex.getNextException();
-	            		}
-	       	}
 
-		//run Lucene queries and store the results in lucene_results
-		//TO-DO
-	       	//NOTE TO ERIC:
-	       	//Can you write some code that exucutes Lucene queries
-	       	//I already generated the query strings which are name lucene_ItemName_query,
-	       	//lucene_Category_query, and lucene_Description_query.
-	       	//The results should be stored in the combined_results ArrayList which I defined above
-
-	    /*
-			Eric's Notes:
+		//run lucene ItemName query
+		if (uses_lucene_name) {
 			try {
 				searcher = new IndexSearcher(indexDirectory);
-				parser = new QueryParser(NameOfIndex, new StandardAnalyzer());
-				Query itemNamesQuery = parser.parse(lucene_ItemName_query);
-				Hits itemNamesHits = searcher.search(itemsNamesQuery);
+				parser = new QueryParser("name", new StandardAnalyzer());
 
-				Pseudocode:
-				Iterate through itemNamesHits and process
-			}
-			catch (...) { ... }
+				Query q = parser.parse(QueryParser.escape(lucene_ItemName_query));
+				Hits hits = searcher.search(q);
 
-	    */
-
-		//find intersection of result arrays. match on item_id
-		for(SearchResult mysql_sr : mysql_results) {
-			String item_id = mysql_sr.getItemId();
-			for (SearchResult lucene_sr : lucene_results) {
-				if (item_id == lucene_sr.getItemId()) {
-					combined_results.add(mysql_sr);
-					break;
+				SearchResult[] results = new SearchResult[numResultsToReturn];
+				Iterator<Hit> iter = hits.iterator();
+				Document d;
+				Hit h;
+				while (iter.hasNext()) {
+					h = iter.next();
+					d = h.getDocument();
+					lucene_name_results.add(new SearchResult(d.get("id"), d.get("name")));
 				}
+			} 
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
-		//array that is eventually returned
+		//run lucene Description query
+		if (uses_lucene_description) {
+			try {
+				searcher = new IndexSearcher(indexDirectory);
+				parser = new QueryParser("description", new StandardAnalyzer());
+
+				Query q = parser.parse(QueryParser.escape(lucene_Description_query));
+				Hits hits = searcher.search(q);
+
+				SearchResult[] results = new SearchResult[numResultsToReturn];
+				Iterator<Hit> iter = hits.iterator();
+				Document d;
+				Hit h;
+				while (iter.hasNext()) {
+					h = iter.next();
+					d = h.getDocument();
+					lucene_description_results.add(new SearchResult(d.get("id"), d.get("name")));
+				}
+			} 
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		//run lucene Category query
+		if (uses_lucene_category) {
+			try {
+				searcher = new IndexSearcher(indexDirectory);
+				parser = new QueryParser("category", new StandardAnalyzer());
+
+				Query q = parser.parse(QueryParser.escape(lucene_Category_query));
+				Hits hits = searcher.search(q);
+
+				SearchResult[] results = new SearchResult[numResultsToReturn];
+				Iterator<Hit> iter = hits.iterator();
+				Document d;
+				Hit h;
+				while (iter.hasNext()) {
+					h = iter.next();
+					d = h.getDocument();
+					lucene_category_results.add(new SearchResult(d.get("id"), d.get("name")));
+				}
+			} 
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	       	
+
+		ArrayList<SearchResult> combined_part1 = new ArrayList<SearchResult>();
+		if (uses_sql) {
+			if (uses_lucene_name) combined_part1 = intersection(mysql_results,lucene_name_results);
+			else combined_part1 = mysql_results;
+		}
+		else combined_part1 = lucene_name_results;
+
+		ArrayList<SearchResult> combined_part2 = new ArrayList<SearchResult>();
+		if (uses_lucene_category) {
+			if (uses_lucene_description) combined_part2 = intersection(lucene_category_results,lucene_description_results);
+			else combined_part2 = lucene_category_results;
+		}
+		else combined_part2 = lucene_description_results;
+
+		if ((uses_sql || uses_lucene_name) && (uses_lucene_description || uses_lucene_category)) {
+			combined_results = intersection(combined_part1,combined_part2);
+		}
+		else if (uses_sql || uses_lucene_name) {
+			combined_results = combined_part1;
+		}
+		else {
+			combined_results = combined_part2;
+		}
+
+		//create a results array of the appropriate size
+		int num_possible = combined_results.size() - numResultsToSkip;
+		if (num_possible < 1) return new SearchResult[0];
+		if (numResultsToReturn == 0) numResultsToReturn = num_possible;
+		if (numResultsToReturn > num_possible) numResultsToReturn = num_possible;
+
 		SearchResult[] results = new SearchResult[numResultsToReturn];
 
 		//populate the results array
 		int num_results_added = 0;
 		for (int i=numResultsToSkip; i<combined_results.size(); i++) {
-			if (numResultsToReturn != 0) {
-				if (num_results_added >= numResultsToReturn) break;
-			}
+			if (num_results_added >= numResultsToReturn) break;
 			results[i-numResultsToSkip] = combined_results.get(i);
 			num_results_added++;
 		}

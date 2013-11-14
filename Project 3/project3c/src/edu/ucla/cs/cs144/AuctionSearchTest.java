@@ -58,13 +58,53 @@ public class AuctionSearchTest {
 
 		SearchResult[] basicResults;
 		for (String q : basicQueries) {
-			basicResults = as.basicSearch(q, 20, 0);
+			basicResults = as.basicSearch(q, 0, 0);
 			System.out.println("Basic Search Query: " + q);
 			System.out.println("Received " + basicResults.length + " results");
 			// for(SearchResult result : basicResults) {
 			// 	System.out.println(result.getItemId() + ": " + result.getName());
 			// }
 		}
+
+		/*
+		SearchConstraint c1 = new SearchConstraint(FieldName.BuyPrice,"5.99");
+		SearchConstraint[] constraints = {c1};
+		SearchResult[] advancedResults = as.advancedSearch(constraints, 0, 20);
+		System.out.println("Advanced Seacrh");
+		System.out.println("Received " + advancedResults.length + " results");
+		for(SearchResult result : advancedResults) {
+		 	System.out.println(result.getItemId() + ": " + result.getName());
+		}
+		*/
+
+		/*
+		SearchConstraint c1 = new SearchConstraint(FieldName.ItemName,"pan");
+		SearchConstraint c2 = new SearchConstraint(FieldName.Category,"kitchenware");
+		SearchConstraint[] constraints = {c1,c2};
+		SearchResult[] advancedResults = as.advancedSearch(constraints, 0, 20);
+		System.out.println("Advanced Seacrh");
+		System.out.println("Received " + advancedResults.length + " results");
+		for(SearchResult result : advancedResults) {
+		 	System.out.println(result.getItemId() + ": " + result.getName());
+		}
+		*/
+
+		/*
+		SearchConstraint c1 = new SearchConstraint(FieldName.EndTime,"Dec-14-01 21:00:05");
+		SearchConstraint[] constraints = {c1};
+		SearchResult[] advancedResults = as.advancedSearch(constraints, 0, 20);
+		System.out.println("Advanced Seacrh");
+		System.out.println("Received " + advancedResults.length + " results");
+		for(SearchResult result : advancedResults) {
+		 	System.out.println(result.getItemId() + ": " + result.getName());
+	 	}
+		*/
+
+	 	String itemId = "1043374545";
+		String item = as.getXMLDataForItemId(itemId);
+		System.out.println("XML data for ItemId: " + itemId);
+		System.out.println(item);
+
 
 		// String item;
 		// for (String id : itemIds) {
