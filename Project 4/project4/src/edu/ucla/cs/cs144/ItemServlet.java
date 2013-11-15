@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.Comparator;
 import java.util.Arrays;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 
 public class ItemServlet extends HttpServlet implements Servlet {
@@ -77,8 +80,24 @@ public class ItemServlet extends HttpServlet implements Servlet {
             return "";
     }
 
-    private BigDecimal strip(String money) {
-    	return (money.equals("")) ? new BigDecimal("0.00") : new BigDecimal(money.substring(1));
+    /* Returns the amount (in XXXXX.xx format) denoted by a money-string
+     * like $3,453.23. Returns the input if the input is an empty string.
+     */
+    static BigDecimal strip(String money) {
+        if (money.equals(""))
+            return new BigDecimal("0.00");
+        else {
+            double am = 0.0;
+            NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US);
+            try { am = nf.parse(money).doubleValue(); }
+            catch (ParseException e) {
+                System.out.println("This method should work for all " +
+                                   "money values you find in our data.");
+                System.exit(20);
+            }
+            nf.setGroupingUsed(false);
+            return new BigDecimal(nf.format(am).substring(1));
+        }
     }
 
     private String[] toStringArray(NodeList list) {
@@ -185,17 +204,5 @@ public class ItemServlet extends HttpServlet implements Servlet {
         } finally {
         	request.getRequestDispatcher("/item.jsp").forward(request, response);
         }
-
-        // // test
-        // response.setContentType("text/html");
-        // PrintWriter out = response.getWriter();
-
-        // out.println("<html> <head> <title> Item Servlet Response </title> </head>");
-        // out.println("<body>");
-        // out.println(xmlData);
-        // out.println("</body>");
-        // out.println("</html>");
-
-        // out.close();
     }
 }
