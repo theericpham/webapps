@@ -13,6 +13,7 @@ public class User {
 	public int getRating() { return rating; }
 	public String getLocation() { return location; }
 	public String getCountry() { return country; }
+	public String getLocationCountry() { return (location.equals("") && country.equals("")) ? "Unknown" : location + ", " + country; }
 
 	private String userId;
 	private int rating;
