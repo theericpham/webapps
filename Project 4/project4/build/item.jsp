@@ -10,64 +10,68 @@
 
 <body>
 
-<h1> Item Information </h1>
+<% if (request.getAttribute("found").equals("yes")) { %>
 
-<table>
-	<tr>
-		<th> Name </th>
-		<td> <%= item.getName() %> </td>
-	</tr>
-	<tr>
-		<th> Description </th>
-		<td> <%= item.getDescription() %> </td>
-	</tr>
-	<tr>
-		<th> Minimum Bid </th>
-		<td> <%= item.getStartPrice() %> </td>
-	</tr>
-	<tr>
-		<th> Buy Price </th>
-		<td> <%= item.getBuyPrice() %> </td>
-	</tr>
-	<tr>
-		<th> Current Highest Bid </th>
-		<td> <%= item.getCurrentPrice() %> </td>
-	</tr>
-	<tr>
-		<th> Started </th>
-		<td> <%= item.getStartTime() %> </td>
-	</tr>
-	<tr>
-		<th> Ends </th>
-		<td> <%= item.getEndTime() %> </td>
-	</tr>
-	<tr>
-		<th> Categories </th>
-		<td> <%= categories %></td>
-	</tr>
-</table>
+	<h1> Item Information </h1>
 
+	<table>
+		<tr>
+			<th> Name </th>
+			<td> <%= item.getName() %> </td>
+		</tr>
+		<tr>
+			<th> Description </th>
+			<td> <%= item.getDescription() %> </td>
+		</tr>
+		<tr>
+			<th> Minimum Bid </th>
+			<td> <%= item.getStartPrice() %> </td>
+		</tr>
+		<tr>
+			<th> Buy Price </th>
+			<td> <%= item.getBuyPrice() %> </td>
+		</tr>
+		<tr>
+			<th> Current Highest Bid </th>
+			<td> <%= item.getCurrentPrice() %> </td>
+		</tr>
+		<tr>
+			<th> Started </th>
+			<td> <%= item.getStartTime() %> </td>
+		</tr>
+		<tr>
+			<th> Ends </th>
+			<td> <%= item.getEndTime() %> </td>
+		</tr>
+		<tr>
+			<th> Categories </th>
+			<td> <%= categories %></td>
+		</tr>
+	</table>
 
-<h1> Seller Information </h1>
+	<h1> Seller Information </h1>
 
-<table>
-	<tr>
-		<th> Name </th>
-		<td> <%= seller.getId() %> </td>
-	</tr>
-	<tr>
-		<th> Rating </th>
-		<td> <%= seller.getRating() %> </td>
-	</tr>
-	<tr>
-		<th> Location </th>
-		<td> <%= seller.getLocationCountry() %> </td>
-	</tr>
-</table>
+	<table>
+		<tr>
+			<th> Name </th>
+			<td> <%= seller.getId() %> </td>
+		</tr>
+		<tr>
+			<th> Rating </th>
+			<td> <%= seller.getRating() %> </td>
+		</tr>
+		<tr>
+			<th> Location </th>
+			<td> <%= seller.getLocationCountry() %> </td>
+		</tr>
+	</table>
 
-<h1> This item has <%= bids.length %> bids </h1>
-
-<% if (bids.length != 0) { %>
+	<% if (bids.length == 1) { %>
+	<h1> This item has 1 bid </h1>
+	<% } else { %>
+	<h1> This item has <%= bids.length %> bids </h1>
+	<% } %>
+	<% if (bids.length != 0) { %>
 	<table>
 		<thead>
 			<tr> 
@@ -90,7 +94,14 @@
 			<% } %>
 		</tbody>
 	</table>
+	<% } %>
+
+<% } else { %>
+
+	<h1> Item Not Found </h1>
+
 <% } %>
+
 </body>
 
 </html>
