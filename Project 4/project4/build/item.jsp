@@ -2,6 +2,7 @@
 <% Item item = (Item) request.getAttribute("item"); %>
 <% User seller = (User) request.getAttribute("seller"); %>
 <% String categories = (String) request.getAttribute("categories"); %>
+<% Bid[] bids = (Bid[]) request.getAttribute("bids"); %>
 
 <html>
 
@@ -64,7 +65,32 @@
 	</tr>
 </table>
 
+<h1> This item has <%= bids.length %> bids </h1>
 
+<% if (bids.length != 0) { %>
+	<table>
+		<thead>
+			<tr> 
+				<th> Bidder </th>
+				<th> Bidder Rating </th>	
+				<th> Bidder Location </th>
+				<th> Bid Time </th>
+				<th> Bid Amount </th>
+			</tr>
+		<thead>
+		<tbody>
+			<% for (int i = 0; i < bids.length; i++) { %>
+			<tr>
+				<td> <%= bids[i].getBidder().getId() %> </td>
+				<td> <%= bids[i].getBidder().getRating() %> </td>
+				<td> <%= bids[i].getBidder().getLocationCountry() %> </td>
+				<td> <%= bids[i].getTime() %> </td>
+				<td> <%= bids[i].getAmount() %> </td>
+			</tr>
+			<% } %>
+		</tbody>
+	</table>
+<% } %>
 </body>
 
 </html>

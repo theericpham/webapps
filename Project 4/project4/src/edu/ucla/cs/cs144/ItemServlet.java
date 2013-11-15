@@ -49,6 +49,25 @@ public class ItemServlet extends HttpServlet implements Servlet {
     	return res;
     }
 
+   //  private Bid[] toBidArray(NodeList list) {
+   //  	int size = list.getLength();
+   //  	Bid[] bids = new Bid[size];
+   //  	for (int i = 0; i < size; i++) {
+   //  		Element bid = (Element) list.item(i);
+   //  		Element bidder = (Element) bid.getElementsByTagName("Bidder").item(0);
+   //  		String bidderId = bidder.getAttribute("UserID");
+   //  		String bidderRating = bidder.getAttribute("Rating");
+   //  		String loc = getElementTextByTagName(bidder, "Location");
+			// String cou = getElementTextByTagName(bidder, "Country");
+			// User b = new User(bidderId,Integer.parseInt(bidderRating), loc, cou);
+
+   //  		BigDecimal amount = new BigDecimal(getElementTextByTagName(bid, "Amount"));
+   //  		Date time = new Date(getElementTextByTagName(bid, "Time"));
+   //  		bids[i] = new Bid(b, amount, time);
+   //  	}
+   //  	return bids;
+   //  }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
@@ -84,6 +103,12 @@ public class ItemServlet extends HttpServlet implements Servlet {
 			String country = getElementTextByTagName(root, "Country");
 			User u = new User(sellerId, Integer.parseInt(sellerRating), location, country);
 			request.setAttribute("seller", u);
+
+			// Bidder data
+			// Bid[] bids = toBidArray(root.getElementsByTagName("Bid"));
+			Bid b = new Bid(new User("Eric", 0, "Los Angeles", "USA"), new BigDecimal("0.00"), new Date());
+			Bid[] bids = new Bid[0];
+			request.setAttribute("bids", bids);
 
 			// Categories
 			String[] categoriesArr = toStringArray(root.getElementsByTagName("Category"));

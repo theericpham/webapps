@@ -2,23 +2,23 @@ package edu.ucla.cs.cs144;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class Bid {
 
-	public Bid(long id, String bid, BigDecimal amt, Date t) {
-		itemId = id;
-		bidderId = bid;
+	public Bid(User b, BigDecimal amt, Date t) {
+		bidder = b;
 		amount = amt;
 		time = t;
+		sdf = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
 	}
 
-	public long getId() { return itemId; }
-	public String getBidderId() { return bidderId; }
-	public BigDecimal getAmount() { return amount; }
-	public Date getTime() { return time; }
+	public User getBidder() { return bidder; }
+	public String getAmount() { return "$" + amount; }
+	public String getTime() { return sdf.format(time); }
 
-	private long itemId;
-	private String bidderId;
+	private User bidder;
 	private BigDecimal amount;
 	private Date time;
+	private SimpleDateFormat sdf;
 }
