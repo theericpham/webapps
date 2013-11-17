@@ -1,0 +1,14 @@
+body {
+    padding: 30px;
+    background-image: url("../img/faint_gray.png");
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.text_input {
+    display: none;
+    height: 50px;
+}
+
+form {
+    display: inline;
+}
