@@ -202,7 +202,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
         	System.out.println("Some Exception Occurred.");
         	e.printStackTrace();
         } finally {
-        	request.getRequestDispatcher("/item.jsp").forward(request, response);
+        	request.getRequestDispatcher("/WEB-INF/item.jsp").forward(request, response);
         }
     }
 }

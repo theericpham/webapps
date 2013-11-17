@@ -24,7 +24,7 @@ public class SearchServlet extends HttpServlet implements Servlet {
 
         request.setAttribute("search_results",sr);
         request.setAttribute("query",query);
-        request.getRequestDispatcher("keywordSearch.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/keywordSearch.jsp").forward(request, response);
         
     }
 }
