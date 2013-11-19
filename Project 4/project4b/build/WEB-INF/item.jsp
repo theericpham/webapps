@@ -13,61 +13,60 @@
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"> </script> 
 	<script type="text/javascript"> 
-	  function initialize() { 
-	    var latlng = new google.maps.LatLng(34.063509,-118.44541); 
-	    var myOptions = { 
-	      zoom: 14, // default is 8  
-	      center: latlng, 
-	      mapTypeId: google.maps.MapTypeId.ROADMAP 
-	    }; 
-	    var map = new google.maps.Map(document.getElementById("map"), myOptions);
+	  	function initialize() { 
+		    var latlng = new google.maps.LatLng(34.063509,-118.44541); 
+		    var myOptions = { 
+		      zoom: 14, // default is 8  
+		      center: latlng, 
+		      mapTypeId: google.maps.MapTypeId.ROADMAP 
+		    }; 
+		    var map = new google.maps.Map(document.getElementById("map"), myOptions);
 
-	    var geocoder = new google.maps.Geocoder();
-	    var fullAddress = "<%= seller.getLocationCountry() %>";
-	    var city = "<%= seller.getLocation() %>";
-	    var country = "<%= seller.getCountry() %>";
-	    var usa = "USA";
+		    var geocoder = new google.maps.Geocoder();
+		    var fullAddress = "<%= seller.getLocationCountry() %>";
+		    var city = "<%= seller.getLocation() %>";
+		    var country = "<%= seller.getCountry() %>";
+		    var usa = "USA";
 
-	    // geocode by fullAddress, then city, then country, then general coordinates
-	    geocoder.geocode({"address": fullAddress}, function(results, status) {
-    		if (status == google.maps.GeocoderStatus.OK) {
-    			map.setCenter(results[0].geometry.location);
-    			map.fitBounds(results[0].geometry.viewport);
-    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
-    		}
-    		else {
-    			geocoder.geocode({ "address": city}, function(results, status) {
-    				if (status == google.maps.GeocoderStatus.OK) {
-		    			map.setCenter(results[0].geometry.location);
-		    			map.fitBounds(results[0].geometry.viewport);
-		    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
-		    		}
-		    		else {
-		    			geocoder.geocode({ "address": country}, function(results, status) {
-		    				if (status == google.maps.GeocoderStatus.OK) {
-				    			map.setCenter(results[0].geometry.location);
-				    			map.fitBounds(results[0].geometry.viewport);
-				    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
-				    		}
-				    		else {
-				    			geocoder.geocode({"address": usa}, function(results, status) {
-				    				map.setCenter(results[0].geometry.location);
+		    // geocode by fullAddress, then city, then country, then general coordinates
+		    geocoder.geocode({"address": fullAddress}, function(results, status) {
+	    		if (status == google.maps.GeocoderStatus.OK) {
+	    			map.setCenter(results[0].geometry.location);
+	    			map.fitBounds(results[0].geometry.viewport);
+	    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
+	    		}
+	    		else {
+	    			geocoder.geocode({ "address": city}, function(results, status) {
+	    				if (status == google.maps.GeocoderStatus.OK) {
+			    			map.setCenter(results[0].geometry.location);
+			    			map.fitBounds(results[0].geometry.viewport);
+			    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
+			    		}
+			    		else {
+			    			geocoder.geocode({ "address": country}, function(results, status) {
+			    				if (status == google.maps.GeocoderStatus.OK) {
+					    			map.setCenter(results[0].geometry.location);
 					    			map.fitBounds(results[0].geometry.viewport);
 					    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
-				    			})
-				    		}
-		    			})
-		    		}
-    			})
-    		}
-	    });
-	  } 
-
-</script>
+					    		}
+					    		else {
+					    			geocoder.geocode({"address": usa}, function(results, status) {
+					    				map.setCenter(results[0].geometry.location);
+						    			map.fitBounds(results[0].geometry.viewport);
+						    			var marker = new google.maps.Marker({map: map, position: results[0].geometry.location});
+					    			})
+					    		}
+			    			})
+			    		}
+	    			})
+	    		}
+		    });
+	  	} 
+	</script>
 </head>
 
 <body onload="initialize()">
-	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="navbar navbar-default navbar-fixed-top search" role="navigation">
 		<form action="item" method="GET" class="navbar-form navbar-left" role="search"> 
 			<div class="form-group"> <label class="control-label"> Find an Item: </label> </div>
 			<div class="form-group"> <input type="text" name="id" class="form-control" placeholder="ItemID"> </div>			
@@ -86,7 +85,7 @@
 			</div> <!-- row -->
 
 			<div class="row">
-				<div class="col-sm-6 item-container">
+				<div class="col-sm-12 item-container">
 					<div class="col-xs-12">
 						<div class="alert alert-success">
 							<h1 class="text-center"> Basic Item Information </h1>
@@ -127,6 +126,41 @@
 						</tr>
 					</table>
 
+
+				</div> 
+			</div> <!-- row -->
+
+			<div class="row">
+				<div class="col-sm-12 map-container">
+					<div class="col-xs-12">
+						<div class="alert alert-info">
+							<h1 class="text-center"> Seller Information </h1>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<table class="table table-bordered table-hover">
+							<tr>
+								<th> Seller Name </th>
+								<td> <%= seller.getId() %> </td>
+							</tr>
+							<tr>
+								<th> Seller Rating </th>
+								<td> <%= seller.getRating() %> </td>
+							</tr>
+							<tr>
+								<th> Seller Location </th>
+								<td> <%= seller.getLocationCountry() %> </td>
+							</tr>
+						</table>
+					</div> <!-- col-sm-4 -->
+					<div class="col-sm-8">
+						<div id="map"> </div>
+					</div> <!-- col-sm-8 -->
+				</div> <!-- map-container -->
+			</div> <!-- row -->
+
+			<div class="row">
+				<div class="col-sm-12 bid-container">
 					<% if (bids.length == 1) { %>
 						<div class="col-xs-12">
 							<div class="alert alert-warning">
@@ -165,33 +199,8 @@
 							</tbody>
 						</table>
 					<% } %>
-
-				</div> <!-- item-container -->
-				<div class="col-sm-6 map-container">
-					<div class="col-xs-12">
-						<div class="alert alert-info">
-							<h1 class="text-center"> Seller Information </h1>
-						</div>
-					</div>
-					<table class="table table-bordered table-hover">
-						<tr>
-							<th> Name </th>
-							<td> <%= seller.getId() %> </td>
-						</tr>
-						<tr>
-							<th> Rating </th>
-							<td> <%= seller.getRating() %> </td>
-						</tr>
-						<tr>
-							<th> Location </th>
-							<td> <%= seller.getLocationCountry() %> </td>
-						</tr>
-					</table>
-
-					<div id="map"> </div>
-
-				</div> <!-- map-container -->
-			</div> <!-- row -->
+				</div> <!-- bid-container -- >
+			</div> <!-- row -- >
 
 		<% } else { %>
 
