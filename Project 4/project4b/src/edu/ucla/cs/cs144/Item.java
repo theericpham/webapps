@@ -15,14 +15,14 @@ public class Item {
 		curPrice = cp;
 		startTime = st;
 		endTime = et;
-		sdf = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+		sdf = new SimpleDateFormat("MMMM  d, yyyy hh:mm aaa");
 	}
 
 	public String getId() { return itemId; }
 	public String getName() { return name; }
 	public String getDescription() { return description; }
 	public String getStartPrice() { return "$" + startPrice; }
-	public String getBuyPrice() { return (buyPrice.intValue() == 0) ? "No Buy Price" : "$" + buyPrice; }
+	public String getBuyPrice() { return (buyPrice.intValue() == 0) ? "N/A" : "$" + buyPrice; }
 	public String getCurrentPrice() { return "$" + curPrice; }
 	public String getStartTime() { return sdf.format(startTime); }
 	public String getEndTime() { return sdf.format(endTime); }

@@ -10,7 +10,7 @@ public class Bid {
 		bidder = b;
 		amount = amt;
 		time = t;
-		sdf = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+		sdf = new SimpleDateFormat("MMMM  d, yyyy hh:mm aaa");
 	}
 
 	public User getBidder() { return bidder; }

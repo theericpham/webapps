@@ -125,6 +125,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
         String id = request.getParameter("id");
         String xmlData = AuctionSearchClient.getXMLDataForItemId(id);
         request.setAttribute("xml", xmlData);
+        request.setAttribute("itemId", id);
 
         // Create and parse XML DOM from xml data
         try {
