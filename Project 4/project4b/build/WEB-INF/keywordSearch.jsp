@@ -3,10 +3,16 @@
     <head>
         <title>Keyword Search</title>
         <link rel="stylesheet" type="text/css" href="css/main.css">
+        <script src="js/jquery.js"></script>
+        <script src="js/main.js"></script>
     </head>
     <body>
+        <h1>Keyword Search</h1>
         <form action="search" method="GET">
-            Query: <input type="text" placeholder="Item Keywords..." name="q" />
+            <input type="text" id="keyword_input" placeholder="Keyword Search" name="q" />
+            <div id="suggestions">
+
+            </div>
             <input type="hidden" name="numResultsToSkip" value="0"/>
             <input type="hidden" name="numResultsToReturn" value="20" />
             <input type="submit" value="Search" /><br/>
