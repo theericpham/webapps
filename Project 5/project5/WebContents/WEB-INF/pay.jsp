@@ -1,6 +1,7 @@
 <%@ page import="edu.ucla.cs.cs144.*" %>
 <html>	
 	<head>	
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 		<title> Order Details </title> 
 	</head>	
@@ -17,7 +18,7 @@
 					<div class="jumbotron">
 						<h1 class="text-center"> Order Details for Item <%= item.getId() %> : </h1>
 					</div>
-					<form action="">
+					<form action="https://<%= request.getServerName() %>:8443<%= request.getContextPath() %>/confirm" method="POST">
 						<table class="table table-hover">
 							<tr>
 								<th> Item Name </th>

@@ -18,6 +18,7 @@ public class PayServlet extends HttpServlet implements Servlet {
 		if (session.isNew()) {
 			// Session is invalid
 			request.setAttribute("valid", "false");
+			session.invalidate();
 		}
 		else {
 			request.setAttribute("valid", "true");
