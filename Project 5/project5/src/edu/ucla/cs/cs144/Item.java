@@ -22,7 +22,8 @@ public class Item {
 	public String getName() { return name; }
 	public String getDescription() { return description; }
 	public String getStartPrice() { return "$" + startPrice; }
-	public String getBuyPrice() { return (buyPrice.intValue() == 0) ? "N/A" : "$" + buyPrice; }
+	public String getBuyPrice() { return (buyPrice.doubleValue() == 0.00) ? "N/A" : "$" + buyPrice; }
+	public boolean hasBuyPrice() { return (buyPrice.doubleValue() > 0.00); }
 	public String getCurrentPrice() { return "$" + curPrice; }
 	public String getStartTime() { return sdf.format(startTime); }
 	public String getEndTime() { return sdf.format(endTime); }

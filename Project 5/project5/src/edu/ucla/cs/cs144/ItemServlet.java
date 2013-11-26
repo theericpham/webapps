@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.*;
 import javax.xml.parsers.*;
@@ -196,6 +197,10 @@ public class ItemServlet extends HttpServlet implements Servlet {
 				String[] categoriesArr = toStringArray(root.getElementsByTagName("Category"));
 				String categories = toString(categoriesArr);
 				request.setAttribute("categories", categories); 
+
+                // Session info
+                HttpSession session = request.getSession(true);
+                session.setAttribute("item", item);
        		} else {
        			request.setAttribute("found", "no");
         	}

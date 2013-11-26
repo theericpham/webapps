@@ -113,7 +113,11 @@
 						</tr>
 						<tr>
 							<th> Buy Price </th>
-							<td> <%= item.getBuyPrice() %> </td>
+							<td> <%= item.getBuyPrice() %> 
+								<% if (item.hasBuyPrice()) { %>
+									<a href="pay" class="btn btn-primary"> Pay Now </a>
+								<% } %>
+							</td>
 						</tr>
 						<tr>
 							<th> Started </th>
